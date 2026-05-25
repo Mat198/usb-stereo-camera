@@ -25,7 +25,7 @@ UsbStereoCameraDriver::UsbStereoCameraDriver(const rclcpp::NodeOptions &options)
 
 UsbStereoCameraDriver::~UsbStereoCameraDriver () {
 
-    if (!m_cap.isOpened()) {
+    if (m_cap.isOpened()) {
         m_cap.release();
     }
     m_processingThread.join();
