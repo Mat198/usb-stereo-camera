@@ -42,7 +42,6 @@ bool UsbStereoCameraDriver::initializeCamera() {
     // Defining MJPG to have better FPS
     int MJPG_FOURCC = cv::VideoWriter::fourcc('M', 'J', 'P', 'G');
     bool setSuccess = m_cap.set(cv::CAP_PROP_FOURCC, MJPG_FOURCC);
-
     if (setSuccess) {
         RCLCPP_INFO_STREAM(m_logger, "Format set to MJPG.");
     } else {
@@ -55,7 +54,15 @@ bool UsbStereoCameraDriver::initializeCamera() {
     m_cap.set(cv::CAP_PROP_FRAME_HEIGHT, 720);
     m_cap.set(cv::CAP_PROP_FPS, 30);
 
+    // Read actual properties to verify
+    int actualWidth = static_cast<int>(m_cap.get(cv::CAP_PROP_FRAME_WIDTH));
+    int actualHeight = static_cast<int>(m_cap.get(cv::CAP_PROP_FRAME_HEIGHT));
+    int actualFPS = static_cast<int>(m_cap.get(cv::CAP_PROP_FPS));
+    
     RCLCPP_INFO_STREAM(m_logger, "Camera opened successfully!");
+    RCLCPP_INFO_STREAM(m_logger, "Camera resolution: " << actualWidth << "x" << actualHeight);
+    RCLCPP_INFO_STREAM(m_logger, "Camera FPS: " << actualFPS);
+    
     return true;
 }
 
