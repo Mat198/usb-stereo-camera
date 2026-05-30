@@ -1,0 +1,98 @@
+stereo_camera_driver:
+  
+  camera_port:
+    type: int
+    default_value: 0
+    description: "USB port number for the stereo camera."
+
+  fps:
+    type: int
+    default_value: 30
+    description: "Frames per second for the stereo camera."
+    validation:
+      one_of<>: [[5, 10, 15, 20, 25, 30]]
+  
+  resolution:
+      type: int_array
+      default_value: [1280, 720]
+      description: "Resolution of the camera images in pixels. One of [640, 360], [640, 480], [1280, 712], [1280, 720]."
+      validation:
+        # Not implemented yet in Generate Parameter Library, so we will validate this in the code instead.
+        # one_of<>: [[[640, 360], [640, 480], [1280, 712], [1280, 720]]] 
+        fixed_size<>: 2
+
+
+  left_camera:
+    name:
+      type: string
+      default_value: "left_camera"
+      description: "Name of the left camera."
+
+    camera_matrix:
+      type: double_array
+      default_value: [953.6, 0.0, 640.0, 0.0, 0.0, 953.6, 360.0, 0.0, 1.0]
+      description: "Camera matrix for the left camera."
+      validation:
+        fixed_size<>: 9
+
+    distortion_model:
+      type: string
+      default_value: "plumb_bob"
+      description: "Distortion model for the left camera."
+
+    distortion_coefficients:
+      type: double_array
+      default_value: [0.0, 0.0, 0.0, 0.0, 0.0]
+      description: "Distortion coefficients for the left camera."
+
+    rectification_matrix:
+      type: double_array
+      default_value: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+      description: "Rectification matrix for the left camera."
+      validation:
+        fixed_size<>: 9
+
+    projection_matrix:
+      type: double_array
+      default_value: [953.6, 0.0, 640.0, 0.0, 0.0, 953.6, 360.0, 0.0, 0.0, 0.0, 1.0, 0.0]
+      description: "Projection matrix for the left camera."
+      validation:
+        fixed_size<>: 12
+
+
+  right_camera:
+    name:
+      type: string
+      default_value: "right_camera"
+      description: "Name of the right camera."
+
+    camera_matrix:
+      type: double_array
+      default_value: [953.6, 0.0, 640.0, 0.0, 0.0, 953.6, 360.0, 0.0, 1.0]
+      description: "Camera matrix for the right camera."
+      validation:
+        fixed_size<>: 9
+
+    distortion_model:
+      type: string
+      default_value: "plumb_bob"
+      description: "Distortion model for the right camera."
+
+    distortion_coefficients:
+      type: double_array
+      default_value: [0.0, 0.0, 0.0, 0.0, 0.0]
+      description: "Distortion coefficients for the right camera."
+
+    rectification_matrix:
+      type: double_array
+      default_value: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+      description: "Rectification matrix for the right camera."
+      validation:
+        fixed_size<>: 9
+
+    projection_matrix:
+      type: double_array
+      default_value: [953.6, 0.0, 640.0, -60.288, 0.0, 953.6, 360.0, 0.0, 0.0, 0.0, 1.0, 0.0]
+      description: "Projection matrix for the right camera."
+      validation:
+        fixed_size<>: 12
