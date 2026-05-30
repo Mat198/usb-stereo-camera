@@ -3,14 +3,20 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/image.hpp"
+#include "sensor_msgs/msg/camera_info.hpp"
+#include "sensor_msgs/srv/set_camera_info.hpp"
 
 // OpenCV includes
 #include <opencv2/opencv.hpp>
 #include <cv_bridge/cv_bridge.hpp>
 
+#include <usb_stereo_camera_driver/stereo_camera_parameters.hpp>
+
 namespace stereoCamera {
 
 using ImageMsg = sensor_msgs::msg::Image;
+using CameraInfo = sensor_msgs::msg::CameraInfo;
+using SetCameraInfo = sensor_msgs::srv::SetCameraInfo;
 
 class UsbStereoCameraDriver : public rclcpp::Node {
 public:
@@ -28,6 +34,16 @@ private:
 
     ImageMsg createImageMsg(cv::Mat &img, const rclcpp::Time &stamp);
 
+    void loadCameraCalibration();
+
+    void setLeftCameraInfoCallback(
+        const SetCameraInfo::Request::SharedPtr request, SetCameraInfo::Response::SharedPtr response
+    );
+
+    void setRightCameraInfoCallback(
+        const SetCameraInfo::Request::SharedPtr request, SetCameraInfo::Response::SharedPtr response
+    );
+
 private:
 
     rclcpp::Clock::SharedPtr m_clock;
@@ -36,12 +52,24 @@ private:
     rclcpp::Publisher<ImageMsg>::SharedPtr m_leftImagePub;
     rclcpp::Publisher<ImageMsg>::SharedPtr m_rightImagePub;
 
-    // only one capture because we expect one big image with the left and right frames side by side
+    rclcpp::Publisher<CameraInfo>::SharedPtr m_leftCameraInfoPub;
+    rclcpp::Publisher<CameraInfo>::SharedPtr m_rightCameraInfoPub;
+
+    // Services to set camera info
+    rclcpp::Service<SetCameraInfo>::SharedPtr m_setLeftCameraInfoService;
+    rclcpp::Service<SetCameraInfo>::SharedPtr m_setRightCameraInfoService;
+
+    // Only one capture because we expect one big image with the left and right frames side by side
     cv::VideoCapture m_cap;
 
     std::thread m_processingThread;
 
-    int m_videoPort;
+    stereo_camera_driver::ParamListener m_paramListener;
+    stereo_camera_driver::Params m_params;
+
+    // Camera calibration data
+    CameraInfo m_leftCameraInfo;
+    CameraInfo m_rightCameraInfo;
 };
-}  // namespace /* namespace_name */
+}  // namespace stereoCamera
 #endif  // USB_STEREO_CAMERA_DRIVER_HPP
