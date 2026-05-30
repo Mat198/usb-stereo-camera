@@ -7,8 +7,10 @@ int main(int argc, char * argv[]) {
     rclcpp::NodeOptions options;
     auto node = std::make_shared<stereoCamera::UsbStereoCameraDriver>(options);
     
-    rclcpp::spin(node);
-    rclcpp::shutdown();
+    rclcpp::executors::MultiThreadedExecutor executor;
+    executor.add_node(node);
+    executor.spin();
     
+    rclcpp::shutdown();
     return 0;
 }
