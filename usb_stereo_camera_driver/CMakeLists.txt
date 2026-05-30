@@ -12,6 +12,7 @@ find_package(rclcpp_components REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(generate_parameter_library REQUIRED)
+find_package(image_transport REQUIRED)
 
 find_package(OpenCV REQUIRED)
 
@@ -28,14 +29,14 @@ generate_parameter_library(
 )
 
 add_executable(stereo_camera_driver src/main.cpp src/driver.cpp)
-ament_target_dependencies(stereo_camera_driver rclcpp sensor_msgs cv_bridge)
+ament_target_dependencies(stereo_camera_driver rclcpp sensor_msgs cv_bridge image_transport)
 target_link_libraries(stereo_camera_driver ${OpenCV_LIBRARIES} stereo_camera_parameters)
 
 install(TARGETS stereo_camera_driver stereo_camera_parameters
   EXPORT ${PROJECT_NAME}Targets)
 
 add_library(stereo_camera_driver_component SHARED src/composable_main.cpp src/driver.cpp)
-ament_target_dependencies(stereo_camera_driver_component rclcpp rclcpp_components sensor_msgs cv_bridge)
+ament_target_dependencies(stereo_camera_driver_component rclcpp rclcpp_components sensor_msgs cv_bridge image_transport)
 target_link_libraries(stereo_camera_driver_component ${OpenCV_LIBRARIES} stereo_camera_parameters)
 
 rclcpp_components_register_node(

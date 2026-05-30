@@ -1,4 +1,5 @@
 #include "usb_stereo_camera_driver/driver.hpp"
+#include "image_transport/image_transport.hpp"
 
 namespace stereoCamera {
 
@@ -10,11 +11,20 @@ UsbStereoCameraDriver::UsbStereoCameraDriver(const rclcpp::NodeOptions &options)
     m_params(m_paramListener.get_params())
 {
 
-    m_leftImagePub = this->create_publisher<ImageMsg>(
-        m_params.left_camera.name + "/image_raw", rclcpp::QoS(1).best_effort()
+
+    const rmw_qos_profile_t imageQos = rclcpp::QoS(1).best_effort().get_rmw_qos_profile();
+    rclcpp::PublisherOptions imagePubOptions;
+
+    m_leftCameraCbGroup = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+    imagePubOptions.callback_group = m_leftCameraCbGroup;
+    m_leftImagePub = image_transport::create_publisher(
+        this, m_params.left_camera.name + "/image_raw", imageQos, imagePubOptions
     );
-    m_rightImagePub = this->create_publisher<ImageMsg>(
-        m_params.right_camera.name + "/image_raw", rclcpp::QoS(1).best_effort()
+
+    m_rightCameraCbGroup = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+    imagePubOptions.callback_group = m_rightCameraCbGroup;
+    m_rightImagePub = image_transport::create_publisher(
+        this, m_params.right_camera.name + "/image_raw", imageQos, imagePubOptions
     );
 
     m_leftCameraInfoPub = this->create_publisher<CameraInfo>(
@@ -125,8 +135,8 @@ void UsbStereoCameraDriver::mainCameraProcessing() {
         m_leftCameraInfo.header.stamp = frameStamp;
         m_rightCameraInfo.header.stamp = frameStamp;
 
-        m_leftImagePub->publish(leftImgMsg);
-        m_rightImagePub->publish(rightImgMsg);
+        m_leftImagePub.publish(leftImgMsg);
+        m_rightImagePub.publish(rightImgMsg);
         m_leftCameraInfoPub->publish(m_leftCameraInfo);
         m_rightCameraInfoPub->publish(m_rightCameraInfo);
     }

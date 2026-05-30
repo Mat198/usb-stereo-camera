@@ -5,6 +5,7 @@
 #include "sensor_msgs/msg/image.hpp"
 #include "sensor_msgs/msg/camera_info.hpp"
 #include "sensor_msgs/srv/set_camera_info.hpp"
+#include "image_transport/image_transport.hpp"
 
 // OpenCV includes
 #include <opencv2/opencv.hpp>
@@ -17,6 +18,7 @@ namespace stereoCamera {
 using ImageMsg = sensor_msgs::msg::Image;
 using CameraInfo = sensor_msgs::msg::CameraInfo;
 using SetCameraInfo = sensor_msgs::srv::SetCameraInfo;
+using ImagePublisher = image_transport::Publisher;
 
 class UsbStereoCameraDriver : public rclcpp::Node {
 public:
@@ -49,8 +51,8 @@ private:
     rclcpp::Clock::SharedPtr m_clock;
     const rclcpp::Logger m_logger;
 
-    rclcpp::Publisher<ImageMsg>::SharedPtr m_leftImagePub;
-    rclcpp::Publisher<ImageMsg>::SharedPtr m_rightImagePub;
+    ImagePublisher m_leftImagePub;
+    ImagePublisher m_rightImagePub;
 
     rclcpp::Publisher<CameraInfo>::SharedPtr m_leftCameraInfoPub;
     rclcpp::Publisher<CameraInfo>::SharedPtr m_rightCameraInfoPub;
@@ -58,6 +60,9 @@ private:
     // Services to set camera info
     rclcpp::Service<SetCameraInfo>::SharedPtr m_setLeftCameraInfoService;
     rclcpp::Service<SetCameraInfo>::SharedPtr m_setRightCameraInfoService;
+
+    rclcpp::CallbackGroup::SharedPtr m_leftCameraCbGroup;
+    rclcpp::CallbackGroup::SharedPtr m_rightCameraCbGroup;
 
     // Only one capture because we expect one big image with the left and right frames side by side
     cv::VideoCapture m_cap;
