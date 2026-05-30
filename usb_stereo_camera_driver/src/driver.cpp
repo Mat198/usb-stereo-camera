@@ -18,13 +18,13 @@ UsbStereoCameraDriver::UsbStereoCameraDriver(const rclcpp::NodeOptions &options)
     m_leftCameraCbGroup = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
     imagePubOptions.callback_group = m_leftCameraCbGroup;
     m_leftImagePub = image_transport::create_publisher(
-        this, m_params.left_camera.name + "/image_raw", imageQos, imagePubOptions
+        this, m_params.left_camera.name + "/image", imageQos, imagePubOptions
     );
 
     m_rightCameraCbGroup = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
     imagePubOptions.callback_group = m_rightCameraCbGroup;
     m_rightImagePub = image_transport::create_publisher(
-        this, m_params.right_camera.name + "/image_raw", imageQos, imagePubOptions
+        this, m_params.right_camera.name + "/image", imageQos, imagePubOptions
     );
 
     m_leftCameraInfoPub = this->create_publisher<CameraInfo>(
