@@ -57,6 +57,48 @@ def stereo_pipeline(context):
                 namespace=LaunchConfiguration('right_camera_name'),
                 extra_arguments=[{'use_intra_process_comms': True}],
             ),
+            ComposableNode(
+                package='stereo_image_proc',
+                plugin='stereo_image_proc::DisparityNode',
+                name='disparity_node',
+                remappings=[
+                    ('left/image_rect', [LaunchConfiguration('left_camera_name'), '/image_rect']),
+                    ('left/camera_info', [LaunchConfiguration('left_camera_name'), '/camera_info']),
+                    ('right/image_rect', [LaunchConfiguration('right_camera_name'), '/image_rect']),
+                    ('right/camera_info', [LaunchConfiguration('right_camera_name'), '/camera_info']),
+                ],
+                extra_arguments=[{'use_intra_process_comms': True}],
+                parameters=[
+                    {'approximate_sync': False},
+                    {'sgbm_mode': 0},
+                    {'prefilter_size': 9},
+                    {'prefilter_cap': 31},
+                    {'correlation_window_size': 15},
+                    {'min_disparity': 0},
+                    {'disparity_range': 64},
+                    {'uniqueness_ratio': 15.0},
+                    {'texture_threshold': 10},
+                    {'speckle_size': 100},
+                    {'speckle_range': 4},
+                ]
+            ),
+            ComposableNode(
+                package='stereo_image_proc',
+                plugin='stereo_image_proc::PointCloudNode',
+                name='point_cloud_node',
+                remappings=[
+                    ('disparity', 'disparity'),
+                    ('left/image_rect_color', [LaunchConfiguration('left_camera_name'), '/image_rect_color']),
+                    ('left/camera_info', [LaunchConfiguration('left_camera_name'), '/camera_info']),
+                    ('right/camera_info', [LaunchConfiguration('right_camera_name'), '/camera_info']),
+                ],
+                extra_arguments=[{'use_intra_process_comms': True}],
+                parameters=[
+                    {'approximate_sync': False},
+                    {'use_color': True},
+                    {'avoid_point_cloud_padding': False},
+                ]
+            ),
         ]
     )
     return [stereo_pipeline_container]
