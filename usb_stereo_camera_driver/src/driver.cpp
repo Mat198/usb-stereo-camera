@@ -10,22 +10,30 @@ UsbStereoCameraDriver::UsbStereoCameraDriver(const rclcpp::NodeOptions &options)
     m_params(m_paramListener.get_params())
 {
 
-    m_leftImagePub = this->create_publisher<ImageMsg>("/left_camera/image/color", 10);
-    m_rightImagePub = this->create_publisher<ImageMsg>("/right_camera/image/color", 10);
+    m_leftImagePub = this->create_publisher<ImageMsg>(
+        m_params.left_camera.name + "/image_raw", rclcpp::QoS(1).best_effort()
+    );
+    m_rightImagePub = this->create_publisher<ImageMsg>(
+        m_params.right_camera.name + "/image_raw", rclcpp::QoS(1).best_effort()
+    );
 
-    m_leftCameraInfoPub = this->create_publisher<CameraInfo>("/left_camera/camera_info", 10);
-    m_rightCameraInfoPub = this->create_publisher<CameraInfo>("/right_camera/camera_info", 10);
+    m_leftCameraInfoPub = this->create_publisher<CameraInfo>(
+        m_params.left_camera.name + "/camera_info", rclcpp::QoS(1).best_effort()
+    );
+    m_rightCameraInfoPub = this->create_publisher<CameraInfo>(
+        m_params.right_camera.name + "/camera_info", rclcpp::QoS(1).best_effort()
+    );
 
     // Create services to set camera info
     using std::placeholders::_1;
     using std::placeholders::_2;
     m_setLeftCameraInfoService = this->create_service<SetCameraInfo>(
-        "/left_camera/set_camera_info", 
+        m_params.left_camera.name + "/set_camera_info", 
         std::bind(&UsbStereoCameraDriver::setLeftCameraInfoCallback, this, _1, _2)
     );
 
     m_setRightCameraInfoService = this->create_service<SetCameraInfo>(
-        "/right_camera/set_camera_info",
+        m_params.right_camera.name + "/set_camera_info",
         std::bind(&UsbStereoCameraDriver::setRightCameraInfoCallback, this, _1, _2)
     );
 
