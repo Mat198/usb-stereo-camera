@@ -56,6 +56,7 @@ def stereo_pipeline(context):
                 remappings=[
                     ('image', 'resize/image'),
                     ('camera_info', 'resize/camera_info'),
+                    ('image_rect', 'resize/image_rect'),
                 ]
             ),
             ComposableNode(
@@ -67,6 +68,7 @@ def stereo_pipeline(context):
                 remappings=[
                     ('image', 'resize/image'),
                     ('camera_info', 'resize/camera_info'),
+                    ('image_rect', 'resize/image_rect'),
                 ]
             ),
             ComposableNode(
@@ -110,9 +112,9 @@ def stereo_pipeline(context):
                 plugin='stereo_image_proc::DisparityNode',
                 name='disparity_node',
                 remappings=[
-                    ('left/image_rect', [LaunchConfiguration('left_camera_name'), '/image_rect']),
+                    ('left/image_rect', [LaunchConfiguration('left_camera_name'), '/resize/image_rect']),
                     ('left/camera_info', [LaunchConfiguration('left_camera_name'), '/resize/camera_info']),
-                    ('right/image_rect', [LaunchConfiguration('right_camera_name'), '/image_rect']),
+                    ('right/image_rect', [LaunchConfiguration('right_camera_name'), '/resize/image_rect']),
                     ('right/camera_info', [LaunchConfiguration('right_camera_name'), '/resize/camera_info']),
                 ],
                 extra_arguments=[{'use_intra_process_comms': True}],
@@ -124,7 +126,7 @@ def stereo_pipeline(context):
                 name='point_cloud_node',
                 remappings=[
                     ('disparity', 'disparity'),
-                    ('left/image_rect_color', [LaunchConfiguration('left_camera_name'), '/image_rect']),
+                    ('left/image_rect_color', [LaunchConfiguration('left_camera_name'), '/resize/image_rect']),
                     ('left/camera_info', [LaunchConfiguration('left_camera_name'), '/resize/camera_info']),
                     ('right/camera_info', [LaunchConfiguration('right_camera_name'), '/resize/camera_info']),
                 ],
