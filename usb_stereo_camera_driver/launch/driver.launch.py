@@ -80,7 +80,7 @@ def stereo_pipeline(context):
                 name='point_cloud_node',
                 remappings=[
                     ('disparity', 'disparity'),
-                    ('left/image_rect_color', [LaunchConfiguration('left_camera_name'), '/image_rect_color']),
+                    ('left/image_rect_color', [LaunchConfiguration('left_camera_name'), '/image_rect']),
                     ('left/camera_info', [LaunchConfiguration('left_camera_name'), '/camera_info']),
                     ('right/camera_info', [LaunchConfiguration('right_camera_name'), '/camera_info']),
                 ],
