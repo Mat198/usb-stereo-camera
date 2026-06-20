@@ -1,0 +1,31 @@
+/disparity_node:
+  ros__parameters:
+    
+    min_disparity: 0
+    queue_size: 5
+    sgbm_mode: 2
+
+    stereo_algorithm: 1
+
+    # --- The Big Adjustments ---
+    correlation_window_size: 5      # Dropped from 135. Try 3, 5, or 7 for SGBM.
+    disparity_range: 128            # Increased from 32. Must be a multiple of 16 (e.g., 64, 128, 256).
+    texture_threshold: 0           # Lowered significantly to accept smoother surfaces.
+    
+    # --- Prefilter Tuning ---
+    prefilter_size: 9               # Lowered from 93. Must be an odd number between 5 and 255.
+    prefilter_cap: 31               # Standard baseline value (usually 1 to 63).
+    
+    # --- Smoothness and Matching ---
+    uniqueness_ratio: 5.0          # 10.0 - 15.0 is usually a good sweet spot.
+    disp12_max_diff: 1              # Usually set to 1 or 2 for left-right consistency check.
+    
+    # --- SGBM Smoothness Penalties (P1 and P2) ---
+    # Rule of thumb: P1 = 8 * channels * window_size^2, P2 = 32 * channels * window_size^2
+    # Assuming a grayscale image (1 channel) and window_size = 5:
+    P1: 300.0                         
+    P2: 2400.0                         
+    
+    # --- Speckle Filter (To clean up noise) ---
+    speckle_size: 100               # Discard small, isolated noise blobs
+    speckle_range: 4
