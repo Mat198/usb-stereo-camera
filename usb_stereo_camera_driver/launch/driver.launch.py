@@ -20,6 +20,10 @@ def stereo_pipeline(context):
         int(LaunchConfiguration('resolution_height').perform(context))
     ]
 
+    disparity_parameters_yaml = PathJoinSubstitution([
+        FindPackageShare('usb_stereo_camera_driver'), 'config', 'disparity_parameters.yaml'
+    ])
+
     stereo_pipeline_container = ComposableNodeContainer(
         name='stereo_pipeline',
         package='rclcpp_components',
@@ -68,19 +72,7 @@ def stereo_pipeline(context):
                     ('right/camera_info', [LaunchConfiguration('right_camera_name'), '/camera_info']),
                 ],
                 extra_arguments=[{'use_intra_process_comms': True}],
-                parameters=[
-                    {'approximate_sync': False},
-                    {'sgbm_mode': 0},
-                    {'prefilter_size': 9},
-                    {'prefilter_cap': 31},
-                    {'correlation_window_size': 15},
-                    {'min_disparity': 0},
-                    {'disparity_range': 64},
-                    {'uniqueness_ratio': 15.0},
-                    {'texture_threshold': 10},
-                    {'speckle_size': 100},
-                    {'speckle_range': 4},
-                ]
+                parameters=[disparity_parameters_yaml]
             ),
             ComposableNode(
                 package='stereo_image_proc',
