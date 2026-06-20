@@ -53,6 +53,11 @@ def stereo_pipeline(context):
                 name='left_rectify_node',
                 namespace=LaunchConfiguration('left_camera_name'),
                 extra_arguments=[{'use_intra_process_comms': True}],
+                remappings=[
+                    ('image', 'resize/image'),
+                    ('camera_info', 'resize/camera_info'),
+                    ('image_rect', 'resize/image_rect'),
+                ]
             ),
             ComposableNode(
                 package='image_proc',
@@ -60,16 +65,57 @@ def stereo_pipeline(context):
                 name='right_rectify_node',
                 namespace=LaunchConfiguration('right_camera_name'),
                 extra_arguments=[{'use_intra_process_comms': True}],
+                remappings=[
+                    ('image', 'resize/image'),
+                    ('camera_info', 'resize/camera_info'),
+                    ('image_rect', 'resize/image_rect'),
+                ]
+            ),
+            ComposableNode(
+                package='image_proc',
+                plugin='image_proc::ResizeNode',
+                name='left_resize_node',
+                namespace=LaunchConfiguration('left_camera_name'),
+                extra_arguments=[{'use_intra_process_comms': True}],
+                parameters=[{
+                    'scale_height': 0.5,
+                    'scale_width': 0.5,
+                    'use_nearest_neighbor': False,
+                    'interpolation': 1
+                }],
+                remappings=[
+                    ('image/image_raw', 'image'),
+                    ('image/camera_info', 'camera_info'),
+                    ('resize/image_raw', 'resize/image')
+                ]
+            ),
+            ComposableNode(
+                package='image_proc',
+                plugin='image_proc::ResizeNode',
+                name='right_resize_node',
+                namespace=LaunchConfiguration('right_camera_name'),
+                extra_arguments=[{'use_intra_process_comms': True}],
+                parameters=[{
+                    'scale_height': 0.5,
+                    'scale_width': 0.5,
+                    'use_nearest_neighbor': False,
+                    'interpolation': 1
+                }],
+                remappings=[
+                    ('image/image_raw', 'image'),
+                    ('image/camera_info', 'camera_info'),
+                    ('resize/image_raw', 'resize/image')
+                ]
             ),
             ComposableNode(
                 package='stereo_image_proc',
                 plugin='stereo_image_proc::DisparityNode',
                 name='disparity_node',
                 remappings=[
-                    ('left/image_rect', [LaunchConfiguration('left_camera_name'), '/image_rect']),
-                    ('left/camera_info', [LaunchConfiguration('left_camera_name'), '/camera_info']),
-                    ('right/image_rect', [LaunchConfiguration('right_camera_name'), '/image_rect']),
-                    ('right/camera_info', [LaunchConfiguration('right_camera_name'), '/camera_info']),
+                    ('left/image_rect', [LaunchConfiguration('left_camera_name'), '/resize/image_rect']),
+                    ('left/camera_info', [LaunchConfiguration('left_camera_name'), '/resize/camera_info']),
+                    ('right/image_rect', [LaunchConfiguration('right_camera_name'), '/resize/image_rect']),
+                    ('right/camera_info', [LaunchConfiguration('right_camera_name'), '/resize/camera_info']),
                 ],
                 extra_arguments=[{'use_intra_process_comms': True}],
                 parameters=[disparity_parameters_yaml]
@@ -80,9 +126,9 @@ def stereo_pipeline(context):
                 name='point_cloud_node',
                 remappings=[
                     ('disparity', 'disparity'),
-                    ('left/image_rect_color', [LaunchConfiguration('left_camera_name'), '/image_rect']),
-                    ('left/camera_info', [LaunchConfiguration('left_camera_name'), '/camera_info']),
-                    ('right/camera_info', [LaunchConfiguration('right_camera_name'), '/camera_info']),
+                    ('left/image_rect_color', [LaunchConfiguration('left_camera_name'), '/resize/image_rect']),
+                    ('left/camera_info', [LaunchConfiguration('left_camera_name'), '/resize/camera_info']),
+                    ('right/camera_info', [LaunchConfiguration('right_camera_name'), '/resize/camera_info']),
                 ],
                 extra_arguments=[{'use_intra_process_comms': True}],
                 parameters=[
