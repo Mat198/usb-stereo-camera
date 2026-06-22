@@ -52,7 +52,7 @@ install(TARGETS stereo_camera_driver_component
   RUNTIME DESTINATION bin
 )
 
-install(DIRECTORY config launch
+install(DIRECTORY config launch rviz
   DESTINATION share/${PROJECT_NAME}
 )
 

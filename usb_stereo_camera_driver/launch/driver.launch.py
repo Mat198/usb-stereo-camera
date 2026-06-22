@@ -1,7 +1,7 @@
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, OpaqueFunction
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
-from launch_ros.actions import ComposableNodeContainer
+from launch_ros.actions import ComposableNodeContainer, Node
 from launch_ros.descriptions import ComposableNode
 from launch_ros.substitutions import FindPackageShare
 
@@ -173,7 +173,40 @@ def generate_launch_description():
         description='Name of the right camera used for camera info frame_id.'
     )
 
+    static_tf_node = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='map_to_left_camera_tf',
+        arguments=[
+            '--yaw', '1.57079632679',
+            '--roll', '-1.57079632679',
+            '--frame-id', 'map',
+            '--child-frame-id', 'left_camera'
+        ]
+    )
+
+    pkg_share = FindPackageShare('usb_stereo_camera_driver')
+    rviz_config_path = PathJoinSubstitution([pkg_share, 'rviz', 'stereo.rviz'])
+    rviz_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        arguments=['-d', rviz_config_path],
+        output='screen'
+    )
+
+    cloud_saver_node = Node(
+        package='usb_stereo_camera_driver',
+        executable='cloud_saver_node.py',
+        name='point_cloud_saver',
+        output='screen',
+        parameters=[{
+            'cloud_topic': '/points2',
+        }]
+    )
+
     return LaunchDescription([
+        # Arguments
         camera_port_arg,
         fps_arg,
         resolution_width_arg,
@@ -181,5 +214,11 @@ def generate_launch_description():
         left_camera_name_arg,
         right_camera_name_arg,
 
+        # Core pipeline logic
         OpaqueFunction(function=stereo_pipeline),
+
+        # Your requested additions
+        static_tf_node,
+        rviz_node,
+        cloud_saver_node
     ])
