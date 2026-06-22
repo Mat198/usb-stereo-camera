@@ -56,5 +56,9 @@ install(DIRECTORY config launch
   DESTINATION share/${PROJECT_NAME}
 )
 
+install(PROGRAMS scripts/cloud_saver_node.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 ament_export_targets(${PROJECT_NAME}Targets HAS_LIBRARY_TARGET)
 ament_package()
